@@ -63,7 +63,7 @@ export function SKUDetailForm({ sku, onSave, onCancel, isNew = false }: SKUDetai
   }
 
   const updateField = (field: string, value: any) => {
-    setFormData((prev: any) => ({ ...prev, [field]: value }))
+    setFormData(prev => ({ ...prev, [field]: value }))
   }
 
   if (!sku && !isNew) {
@@ -140,7 +140,7 @@ export function SKUDetailForm({ sku, onSave, onCancel, isNew = false }: SKUDetai
             <div>
               <Label>카테고리</Label>
               {isEditing ? (
-                <Select value={formData.category || ''} onValueChange={(value: any) => updateField('category', value)}>
+                <Select value={formData.category || ''} onValueChange={(value) => updateField('category', value)}>
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="카테고리 선택" />
                   </SelectTrigger>
@@ -160,7 +160,7 @@ export function SKUDetailForm({ sku, onSave, onCancel, isNew = false }: SKUDetai
             <div>
               <Label>상태</Label>
               {isEditing ? (
-                <Select value={formData.status || ''} onValueChange={(value: any) => updateField('status', value)}>
+                <Select value={formData.status || ''} onValueChange={(value) => updateField('status', value)}>
                   <SelectTrigger className="mt-1">
                     <SelectValue />
                   </SelectTrigger>
@@ -223,7 +223,7 @@ export function SKUDetailForm({ sku, onSave, onCancel, isNew = false }: SKUDetai
             <div>
               <Label>담당자</Label>
               {isEditing ? (
-                <Select value={formData.assignee || ''} onValueChange={(value: any) => updateField('assignee', value)}>
+                <Select value={formData.assignee || ''} onValueChange={(value) => updateField('assignee', value)}>
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="담당자 선택" />
                   </SelectTrigger>
@@ -245,7 +245,7 @@ export function SKUDetailForm({ sku, onSave, onCancel, isNew = false }: SKUDetai
             <div>
               <Label>공급업체</Label>
               {isEditing ? (
-                <Select value={formData.supplier || ''} onValueChange={(value: any) => updateField('supplier', value)}>
+                <Select value={formData.supplier || ''} onValueChange={(value) => updateField('supplier', value)}>
                   <SelectTrigger className="mt-1">
                     <SelectValue placeholder="공급업체 선택" />
                   </SelectTrigger>
@@ -313,7 +313,7 @@ export function SKUDetailForm({ sku, onSave, onCancel, isNew = false }: SKUDetai
             </div>
             <Switch
               checked={formData.discontinued || false}
-              onCheckedChange={(checked: boolean) => updateField('discontinued', checked)}
+              onCheckedChange={(checked) => updateField('discontinued', checked)}
               disabled={!isEditing}
             />
           </div>

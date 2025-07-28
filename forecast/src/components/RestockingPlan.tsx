@@ -167,7 +167,7 @@ export function RestockingPlan({ selectedIssue }: RestockingPlanProps) {
               <div className="grid grid-cols-3 gap-4">
                 <div>
                   <Label>공급업체</Label>
-                  <Select value={newPlan.supplier} onValueChange={(value: any) => setNewPlan({...newPlan, supplier: value})}>
+                  <Select value={newPlan.supplier} onValueChange={(value) => setNewPlan({...newPlan, supplier: value})}>
                     <SelectTrigger className="mt-1">
                       <SelectValue placeholder="공급업체 선택" />
                     </SelectTrigger>

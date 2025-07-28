@@ -98,7 +98,7 @@ function getIssueBadge(issue: string) {
   }
 }
 
-export function SKUActualVsForecastTable({selectedSKU}: { selectedSKU: string }) {
+export function SKUActualVsForecastTable() {
   return (
     <div className="w-full">
       <h3 className="mb-4">실제 vs 예측 테이블</h3>
