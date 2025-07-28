@@ -163,7 +163,12 @@ export function IssueDetailPanel({ issue, onUpdate }: IssueDetailPanelProps) {
             <div>
               <Label>이슈 유형</Label>
               {isEditing ? (
-                <Select value={editedIssue.type || ''} onValueChange={(value) => setEditedIssue({...editedIssue, type: value})}>
+                <Select
+                  value={editedIssue.type || ''}
+                  onValueChange={(value: string) =>
+                    setEditedIssue({ ...editedIssue, type: value })
+                  }
+                >
                   <SelectTrigger className="mt-1">
                     <SelectValue />
                   </SelectTrigger>
@@ -183,7 +188,12 @@ export function IssueDetailPanel({ issue, onUpdate }: IssueDetailPanelProps) {
             <div>
               <Label>우선순위</Label>
               {isEditing ? (
-                <Select value={editedIssue.priority || ''} onValueChange={(value) => setEditedIssue({...editedIssue, priority: value})}>
+                <Select
+                  value={editedIssue.priority || ''}
+                  onValueChange={(value: string) =>
+                    setEditedIssue({ ...editedIssue, priority: value })
+                  }
+                >
                   <SelectTrigger className="mt-1">
                     <SelectValue />
                   </SelectTrigger>

@@ -98,7 +98,13 @@ function getIssueBadge(issue: string) {
   }
 }
 
-export function SKUActualVsForecastTable() {
+interface SKUActualVsForecastTableProps {
+  selectedSKU?: string;
+}
+
+export function SKUActualVsForecastTable({
+  selectedSKU,
+}: SKUActualVsForecastTableProps) {
   return (
     <div className="w-full">
       <h3 className="mb-4">실제 vs 예측 테이블</h3>
