@@ -7,6 +7,7 @@ import { SKUForecastPage } from "./pages/SKUForecastPage"
 import { UploadPage } from "./pages/UploadPage"
 import { MasterPage } from "./pages/MasterPage"
 import { IssuesPage } from "./pages/IssuesPage"
+import "./styles/globals.css"
 
 export default function App() {
   return (
