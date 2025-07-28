@@ -9,7 +9,11 @@ const issuesSummary = {
   normal: 86
 }
 
-export function SKUIssuesSummary() {
+interface SKUIssuesSummaryProps {
+  selectedSKU?: string;
+}
+
+export function SKUIssuesSummary({ selectedSKU }: SKUIssuesSummaryProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
       <Alert className="border-red-200 bg-red-50">

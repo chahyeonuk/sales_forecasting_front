@@ -16,7 +16,15 @@ const skuForecastData = [
   { month: '2025-06', qty_actual: null, qty_forecast: 320, krw_actual: null, krw_forecast: 3200000 }
 ]
 
-export function SKUForecastChart() {
+interface SKUForecastChartProps {
+  selectedSKU?: string;
+  dateRange?: string;
+}
+
+export function SKUForecastChart({
+  selectedSKU,
+  dateRange,
+}: SKUForecastChartProps) {
   return (
     <div className="w-full h-96">
       <h3 className="mb-4">SKU Forecast: Qty, KRW</h3>
@@ -42,13 +50,19 @@ export function SKUForecastChart() {
             tick={{ fontSize: 12 }}
             label={{ value: '금액 (원)', angle: 90, position: 'insideRight' }}
           />
-          <Tooltip 
+          <Tooltip
             formatter={(value, name) => {
-              if (name.includes('qty')) {
-                return [value + '개', name.includes('actual') ? '실제 수량' : '예측 수량']
-              } else {
-                return [new Intl.NumberFormat('ko-KR').format(value as number) + '원', name.includes('actual') ? '실제 매출' : '예측 매출']
+              const key = String(name);
+              if (key.includes('qty')) {
+                return [
+                  value + '개',
+                  key.includes('actual') ? '실제 수량' : '예측 수량',
+                ];
               }
+              return [
+                new Intl.NumberFormat('ko-KR').format(value as number) + '원',
+                key.includes('actual') ? '실제 매출' : '예측 매출',
+              ];
             }}
             labelFormatter={(label) => `기간: ${label}`}
           />
