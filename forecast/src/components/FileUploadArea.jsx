@@ -34,10 +34,10 @@ const mockUploadHistory = [
 ]
 
 export function FileUploadArea() {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [selectedFile, setSelectedFile] = useState(null)
   const [uploading, setUploading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const fileInputRef = useRef(null)
 
   const handleFileSelect = (event) => {
     const file = event.target.files?.[0]

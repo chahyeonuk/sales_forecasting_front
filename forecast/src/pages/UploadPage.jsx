@@ -65,7 +65,7 @@ export function UploadPage() {
     { source: "Price", target: "Unit_Price", mapped: true }
   ]
 
-  const getStatusBadge = (status: string) => {
+  const getStatusBadge = (status) => {
     switch (status) {
       case 'processing':
         return <Badge className="bg-blue-100 text-blue-800">처리중</Badge>
