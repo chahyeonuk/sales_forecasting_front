@@ -267,10 +267,3 @@ export {
   MenubarSubTrigger,
   MenubarSubContent,
 };
-  MenubarCheckboxItem,
-  MenubarRadioGroup,
-  MenubarRadioItem,
-  MenubarSub,
-  MenubarSubTrigger,
-  MenubarSubContent,
-};
