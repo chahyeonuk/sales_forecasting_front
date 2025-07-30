@@ -1,293 +1,188 @@
 import { useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
+import { Search, Plus, Package, User, Calendar } from "lucide-react"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
+import { Card, CardContent } from "./ui/card"
 import { Badge } from "./ui/badge"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
-import { Search, Filter, Eye, Edit, AlertTriangle, CheckCircle } from "lucide-react"
 
-const mockSKUData = [
+// Mock SKU data
+const mockSKUs = [
   {
-    id: "SKU-001",
-    name: "아스피린 100mg",
+    id: "SKU-A001",
+    name: "갤럭시 스마트폰",
+    category: "전자제품",
     tca: "TCA-001",
-    tcaName: "심혈관계",
-    stock: 1250,
-    forecast: 1420,
-    accuracy: 98.5,
-    status: "normal",
-    lastUpdated: "2024-01-15"
+    inn: "INN-A001",
+    assignee: "김담당자",
+    status: "active",
+    reorderPoint: 50,
+    currentStock: 25,
+    discontinued: false,
+    createdDate: "2024-01-15",
+    lastModified: "2024-07-20"
   },
   {
-    id: "SKU-002", 
-    name: "메트포민 500mg",
-    tca: "TCA-005",
-    tcaName: "내분비계",
-    stock: 890,
-    forecast: 950,
-    accuracy: 96.2,
-    status: "warning",
-    lastUpdated: "2024-01-14"
+    id: "SKU-B203",
+    name: "데님 청바지",
+    category: "의류",
+    tca: "TCA-002",
+    inn: "INN-B203",
+    assignee: "이관리자",
+    status: "active",
+    reorderPoint: 30,
+    currentStock: 15,
+    discontinued: false,
+    createdDate: "2024-02-10",
+    lastModified: "2024-07-18"
   },
   {
-    id: "SKU-003",
-    name: "로사르탄 50mg", 
-    tca: "TCA-001",
-    tcaName: "심혈관계",
-    stock: 450,
-    forecast: 520,
-    accuracy: 94.8,
-    status: "critical",
-    lastUpdated: "2024-01-13"
-  },
-  {
-    id: "SKU-004",
-    name: "오메프라졸 20mg",
-    tca: "TCA-002", 
-    tcaName: "소화기계",
-    stock: 760,
-    forecast: 780,
-    accuracy: 99.1,
-    status: "normal",
-    lastUpdated: "2024-01-15"
-  },
-  {
-    id: "SKU-005",
-    name: "살부타몰 흡입제",
+    id: "SKU-C105",
+    name: "신라면 컵라면",
+    category: "식품",
     tca: "TCA-003",
-    tcaName: "호흡기계", 
-    stock: 320,
-    forecast: 380,
-    accuracy: 92.3,
-    status: "warning",
-    lastUpdated: "2024-01-12"
+    inn: "INN-C105",
+    assignee: "박팀장",
+    status: "low_stock",
+    reorderPoint: 100,
+    currentStock: 0,
+    discontinued: false,
+    createdDate: "2024-03-05",
+    lastModified: "2024-07-25"
+  },
+  {
+    id: "SKU-D078",
+    name: "화이트닝 크림",
+    category: "화장품",
+    tca: "TCA-004",
+    inn: "INN-D078",
+    assignee: "최분석가",
+    status: "active",
+    reorderPoint: 20,
+    currentStock: 35,
+    discontinued: false,
+    createdDate: "2024-04-12",
+    lastModified: "2024-07-22"
+  },
+  {
+    id: "SKU-E234",
+    name: "무선 이어폰",
+    category: "전자제품",
+    tca: "TCA-005",
+    inn: "INN-E234",
+    assignee: "정담당자",
+    status: "active",
+    reorderPoint: 40,
+    currentStock: 60,
+    discontinued: false,
+    createdDate: "2024-05-20",
+    lastModified: "2024-07-24"
+  },
+  {
+    id: "SKU-F456",
+    name: "세탁세제",
+    category: "생활용품",
+    tca: "TCA-006",
+    inn: "INN-F456",
+    assignee: "김담당자",
+    status: "discontinued",
+    reorderPoint: 25,
+    currentStock: 10,
+    discontinued: true,
+    createdDate: "2024-01-30",
+    lastModified: "2024-06-15"
   }
 ]
 
-export function SKUSearchAndList() {
+function getStatusBadge(status) {
+  switch (status) {
+    case 'active':
+      return <Badge variant="secondary" className="bg-green-100 text-green-800">활성</Badge>
+    case 'low_stock':
+      return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">재고부족</Badge>
+    case 'discontinued':
+      return <Badge variant="destructive">단종</Badge>
+    default:
+      return <Badge variant="outline">알 수 없음</Badge>
+  }
+}
+
+export function SKUSearchAndList({ onSKUSelect, onNewSKU, selectedSKUId }) {
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedTCA, setSelectedTCA] = useState("all")
-  const [selectedStatus, setSelectedStatus] = useState("all")
-  const [selectedSKU, setSelectedSKU] = useState(null)
 
-  const filteredData = mockSKUData.filter(sku => {
-    const matchesSearch = sku.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         sku.name.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesTCA = selectedTCA === "all" || sku.tca === selectedTCA
-    const matchesStatus = selectedStatus === "all" || sku.status === selectedStatus
-    
-    return matchesSearch && matchesTCA && matchesStatus
-  })
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case "normal":
-        return <Badge variant="default" className="bg-green-100 text-green-800">정상</Badge>
-      case "warning":
-        return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">주의</Badge>
-      case "critical":
-        return <Badge variant="destructive" className="bg-red-100 text-red-800">위험</Badge>
-      default:
-        return <Badge variant="outline">{status}</Badge>
-    }
-  }
-
-  const getStatusIcon = (status) => {
-    switch (status) {
-      case "normal":
-        return <CheckCircle className="h-4 w-4 text-green-600" />
-      case "warning":
-      case "critical":
-        return <AlertTriangle className="h-4 w-4 text-yellow-600" />
-      default:
-        return null
-    }
-  }
+  const filteredSKUs = mockSKUs.filter(sku => 
+    sku.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    sku.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    sku.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    sku.tca.toLowerCase().includes(searchTerm.toLowerCase())
+  )
 
   return (
-    <div className="space-y-6">
-      {/* Search and Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle>SKU 검색 및 목록</CardTitle>
-          <CardDescription>등록된 SKU를 검색하고 관리하세요</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4 mb-4">
-            {/* Search Input */}
-            <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="SKU 코드 또는 제품명 검색..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
+    <div className="space-y-4">
+      {/* Search Bar and New Button */}
+      <div className="flex gap-2">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="SKU 검색..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10"
+          />
+        </div>
+        <Button onClick={onNewSKU}>
+          <Plus className="w-4 h-4 mr-2" />
+          신규
+        </Button>
+      </div>
 
-            {/* TCA Filter */}
-            <Select value={selectedTCA} onValueChange={setSelectedTCA}>
-              <SelectTrigger className="w-48">
-                <SelectValue placeholder="TCA 선택" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">전체 TCA</SelectItem>
-                <SelectItem value="TCA-001">심혈관계</SelectItem>
-                <SelectItem value="TCA-002">소화기계</SelectItem>
-                <SelectItem value="TCA-003">호흡기계</SelectItem>
-                <SelectItem value="TCA-004">신경계</SelectItem>
-                <SelectItem value="TCA-005">내분비계</SelectItem>
-              </SelectContent>
-            </Select>
-
-            {/* Status Filter */}
-            <Select value={selectedStatus} onValueChange={setSelectedStatus}>
-              <SelectTrigger className="w-32">
-                <SelectValue placeholder="상태" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">전체</SelectItem>
-                <SelectItem value="normal">정상</SelectItem>
-                <SelectItem value="warning">주의</SelectItem>
-                <SelectItem value="critical">위험</SelectItem>
-              </SelectContent>
-            </Select>
-
-            <Button>
-              <Filter className="w-4 h-4 mr-2" />
-              필터 적용
-            </Button>
-          </div>
-
-          {/* Results Summary */}
-          <div className="flex items-center justify-between mb-4 text-sm text-muted-foreground">
-            <span>{filteredData.length}개의 SKU가 검색되었습니다</span>
-            <div className="flex gap-4">
-              <span>정상: {filteredData.filter(s => s.status === 'normal').length}</span>
-              <span>주의: {filteredData.filter(s => s.status === 'warning').length}</span>
-              <span>위험: {filteredData.filter(s => s.status === 'critical').length}</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* SKU List Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>SKU 목록</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>상태</TableHead>
-                <TableHead>SKU 코드</TableHead>
-                <TableHead>제품명</TableHead>
-                <TableHead>TCA</TableHead>
-                <TableHead className="text-right">재고</TableHead>
-                <TableHead className="text-right">예측량</TableHead>
-                <TableHead className="text-right">정확도</TableHead>
-                <TableHead>최종 업데이트</TableHead>
-                <TableHead className="text-center">작업</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredData.map((sku) => (
-                <TableRow 
-                  key={sku.id} 
-                  className={`cursor-pointer hover:bg-muted/50 ${selectedSKU === sku.id ? 'bg-muted' : ''}`}
-                  onClick={() => setSelectedSKU(sku.id)}
-                >
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {getStatusIcon(sku.status)}
-                      {getStatusBadge(sku.status)}
+      {/* SKU List */}
+      <div className="space-y-2">
+        <h3>SKU 리스트</h3>
+        <div className="space-y-2 max-h-96 overflow-y-auto">
+          {filteredSKUs.map((sku) => (
+            <Card
+              key={sku.id}
+              className={`cursor-pointer transition-colors hover:bg-accent/50 ${
+                selectedSKUId === sku.id ? 'ring-2 ring-primary' : ''
+              }`}
+              onClick={() => onSKUSelect(sku)}
+            >
+              <CardContent className="p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-3 flex-1">
+                    <Package className="w-5 h-5 text-primary mt-0.5" />
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h4 className="truncate">{sku.name}</h4>
+                        {getStatusBadge(sku.status)}
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                        <span>{sku.id}</span>
+                        <span>{sku.category}</span>
+                        <span>TCA: {sku.tca}</span>
+                      </div>
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
+                        <span className="flex items-center gap-1">
+                          <User className="w-3 h-3" />
+                          {sku.assignee}
+                        </span>
+                        <span>재고: {sku.currentStock}개</span>
+                        <span>재주문점: {sku.reorderPoint}개</span>
+                      </div>
                     </div>
-                  </TableCell>
-                  <TableCell className="font-mono">{sku.id}</TableCell>
-                  <TableCell className="font-medium">{sku.name}</TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-mono text-xs text-muted-foreground">{sku.tca}</div>
-                      <div className="text-sm">{sku.tcaName}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <span className={`font-medium ${
-                      sku.stock < sku.forecast * 0.8 ? 'text-red-600' : 
-                      sku.stock < sku.forecast ? 'text-yellow-600' : 'text-green-600'
-                    }`}>
-                      {sku.stock.toLocaleString()}
-                    </span>
-                  </TableCell>
-                  <TableCell className="text-right font-medium">
-                    {sku.forecast.toLocaleString()}
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <Badge variant={sku.accuracy >= 95 ? "default" : "secondary"}>
-                      {sku.accuracy}%
-                    </Badge>
-                  </TableCell>
-                  <TableCell className="text-sm text-muted-foreground">
-                    {sku.lastUpdated}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center justify-center gap-1">
-                      <Button variant="ghost" size="sm">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
-          {filteredData.length === 0 && (
-            <div className="text-center py-8 text-muted-foreground">
-              검색 조건에 맞는 SKU가 없습니다.
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Selected SKU Quick Info */}
-      {selectedSKU && (
-        <Card>
-          <CardHeader>
-            <CardTitle>선택된 SKU 정보</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {(() => {
-              const sku = filteredData.find(s => s.id === selectedSKU)
-              if (!sku) return null
-              
-              return (
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <h4 className="font-medium">{sku.name}</h4>
-                    <p className="text-sm text-muted-foreground">{sku.id}</p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium">재고 상태</h4>
-                    <p className="text-sm">
-                      현재: {sku.stock.toLocaleString()} / 예측: {sku.forecast.toLocaleString()}
-                    </p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium">예측 정확도</h4>
-                    <p className="text-sm">{sku.accuracy}%</p>
                   </div>
                 </div>
-              )
-            })()}
-          </CardContent>
-        </Card>
-      )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+        
+        {filteredSKUs.length === 0 && (
+          <div className="text-center py-8 text-muted-foreground">
+            검색 조건에 맞는 SKU가 없습니다.
+          </div>
+        )}
+      </div>
     </div>
   )
 }

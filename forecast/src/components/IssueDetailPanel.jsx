@@ -8,6 +8,8 @@ import { Textarea } from "./ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
 import { Label } from "./ui/label"
 
+
+
 export function IssueDetailPanel({ issue, onUpdate }) {
   const [isEditing, setIsEditing] = useState(false)
   const [editedIssue, setEditedIssue] = useState(issue)

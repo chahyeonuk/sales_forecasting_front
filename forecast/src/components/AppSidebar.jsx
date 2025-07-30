@@ -1,85 +1,67 @@
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "./ui/sidebar"
-import { 
-  BarChart3, 
-  TrendingUp, 
-  Upload, 
-  AlertTriangle, 
-  Settings,
-  Home
-} from "lucide-react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useLocation, Link } from "react-router-dom"
+import { ChevronRight, BarChart3, TrendingUp, Package, Upload, Database, AlertTriangle } from "lucide-react"
+import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarHeader } from "./ui/sidebar"
 
 const menuItems = [
   {
     title: "Dashboard",
-    url: "/",
-    icon: Home,
+    icon: BarChart3,
+    path: "/"
   },
   {
     title: "TCA 예측",
-    url: "/tca-forecast", 
-    icon: BarChart3,
+    icon: TrendingUp,
+    path: "/tca-forecast"
   },
   {
-    title: "SKU 예측",
-    url: "/sku-forecast",
-    icon: TrendingUp,
+    title: "SKU 예측", 
+    icon: Package,
+    path: "/sku-forecast"
   },
   {
     title: "Upload",
-    url: "/upload",
     icon: Upload,
-  },
-  {
-    title: "Issues",
-    url: "/issues",
-    icon: AlertTriangle,
+    path: "/upload"
   },
   {
     title: "Master",
-    url: "/master",
-    icon: Settings,
+    icon: Database,
+    path: "/master"
   },
+  {
+    title: "Issues",
+    icon: AlertTriangle,
+    path: "/issues"
+  }
 ]
 
 export function AppSidebar() {
   const location = useLocation()
-  const navigate = useNavigate()
 
   return (
-    <Sidebar>
-      <SidebarHeader>
-        <div className="px-3 py-2">
-          <h2 className="text-lg font-semibold">TCA Forecast</h2>
+    <Sidebar className="border-r border-border">
+      <SidebarHeader className="p-4">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 bg-primary rounded"></div>
+          <span>TCA Dashboard</span>
         </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton 
+                    isActive={location.pathname === item.path}
+                    className="w-full justify-start"
                     asChild
-                    isActive={location.pathname === item.url}
-                    onClick={() => navigate(item.url)}
                   >
-                    <div className="flex items-center gap-2 cursor-pointer">
-                      <item.icon className="h-4 w-4" />
+                    <Link to={item.path}>
+                      <item.icon className="w-4 h-4" />
                       <span>{item.title}</span>
-                    </div>
+                      <ChevronRight className="ml-auto w-4 h-4" />
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -87,11 +69,6 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
-        <div className="px-3 py-2 text-xs text-muted-foreground">
-          Version 1.0.0
-        </div>
-      </SidebarFooter>
     </Sidebar>
   )
 }

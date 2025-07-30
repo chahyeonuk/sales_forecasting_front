@@ -126,6 +126,7 @@ function getPriorityBadge(priority) {
   }
 }
 
+
 export function IssueList({ onIssueSelect, selectedIssueId }) {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterType, setFilterType] = useState("all")

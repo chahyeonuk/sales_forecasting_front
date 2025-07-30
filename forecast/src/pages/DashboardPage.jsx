@@ -1,116 +1,114 @@
-import { DashboardFilters } from "../components/DashboardFilters"
+import { useState } from "react"
+import { BarChart3, TrendingUp, Package, AlertTriangle, Target, DollarSign } from "lucide-react"
+import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { TCAForecastChart } from "../components/TCAForecastChart"
 import { TCASummaryTable } from "../components/TCASummaryTable"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card"
-import { Badge } from "../components/ui/badge"
+import { DashboardFilters } from "../components/DashboardFilters"
 
 export function DashboardPage() {
-  // Sample KPI data
+  const [selectedTCA, setSelectedTCA] = useState("TCA-001")
+  const [dateRange, setDateRange] = useState("24months")
+
   const kpiData = [
     {
-      title: "총 예측량",
-      value: "1,234,567",
-      unit: "units",
+      title: "총 TCA 매출",
+      value: "₩15.2억",
       change: "+12.5%",
-      trend: "up"
+      icon: DollarSign,
+      changeType: "positive"
     },
     {
-      title: "평균 정확도", 
-      value: "94.2",
-      unit: "%",
+      title: "예측 정확도",
+      value: "87.3%",
       change: "+2.1%",
-      trend: "up"
+      icon: Target,
+      changeType: "positive"
     },
     {
-      title: "재고 회전율",
-      value: "8.4",
-      unit: "회",
-      change: "-0.8%", 
-      trend: "down"
+      title: "활성 SKU",
+      value: "1,247개",
+      change: "-5개",
+      icon: Package,
+      changeType: "negative"
     },
     {
-      title: "재고 부족 위험",
-      value: "23",
-      unit: "SKU",
-      change: "0%",
-      trend: "stable"
+      title: "이슈 발생률",
+      value: "3.2%",
+      change: "-0.8%",
+      icon: AlertTriangle,
+      changeType: "positive"
     }
   ]
 
   return (
     <div className="p-6 space-y-6">
-      {/* Page Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">TCA Forecast Dashboard</h1>
-          <p className="text-muted-foreground">24개월 예측 및 분석 대시보드</p>
+          <h1>TCA 예측 대시보드</h1>
+          <p className="text-muted-foreground">전체 TCA 매출 및 예측 현황을 확인하세요</p>
         </div>
-        <DashboardFilters />
       </div>
+      
+      <DashboardFilters 
+        selectedTCA={selectedTCA}
+        onTCAChange={setSelectedTCA}
+        dateRange={dateRange}
+        onDateRangeChange={setDateRange}
+      />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         {kpiData.map((kpi, index) => (
           <Card key={index}>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{kpi.title}</CardTitle>
+              <CardTitle className="text-sm">{kpi.title}</CardTitle>
+              <kpi.icon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">
-                {kpi.value}
-                <span className="text-sm font-normal text-muted-foreground ml-1">
-                  {kpi.unit}
-                </span>
-              </div>
-              <div className="flex items-center space-x-2 text-xs text-muted-foreground">
-                <Badge 
-                  variant={kpi.trend === 'up' ? 'default' : kpi.trend === 'down' ? 'destructive' : 'secondary'}
-                  className="text-xs"
-                >
-                  {kpi.change}
-                </Badge>
-                <span>from last period</span>
+              <div className="space-y-1">
+                <div className="text-2xl">{kpi.value}</div>
+                <p className={`text-xs ${
+                  kpi.changeType === 'positive' 
+                    ? 'text-green-600' 
+                    : 'text-red-600'
+                }`}>
+                  {kpi.change} 전월 대비
+                </p>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
-
-      {/* Main Chart */}
+      
+      {/* Main Content */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
         <div className="xl:col-span-2">
-          <TCAForecastChart />
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="w-5 h-5" />
+                TCA 예측 차트
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <TCAForecastChart selectedTCA={selectedTCA} dateRange={dateRange} />
+            </CardContent>
+          </Card>
         </div>
         <div className="xl:col-span-1">
           <Card>
             <CardHeader>
-              <CardTitle>주요 지표</CardTitle>
-              <CardDescription>이번 달 핵심 성과 지표</CardDescription>
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="w-5 h-5" />
+                TCA 요약
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between items-center">
-                <span className="text-sm">예측 정확도</span>
-                <span className="font-semibold">94.2%</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">재고 회전율</span>
-                <span className="font-semibold">8.4회</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">평균 리드타임</span>
-                <span className="font-semibold">12일</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-sm">재고 부족률</span>
-                <span className="font-semibold text-red-600">1.8%</span>
-              </div>
+            <CardContent>
+              <TCASummaryTable selectedTCA={selectedTCA} />
             </CardContent>
           </Card>
         </div>
       </div>
-
-      {/* Summary Table */}
-      <TCASummaryTable />
     </div>
   )
 }
