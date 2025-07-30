@@ -63,6 +63,7 @@ function SidebarProvider({
   const setOpen = React.useCallback(
     (value) => {
       const openState = typeof value === "function" ? value(open) : value;
+      
       if (setOpenProp) {
         setOpenProp(openState);
       } else {
@@ -667,6 +668,14 @@ function SidebarMenuSubButton({
     />
   );
 }
+
+// 반드시 SidebarProvider로 감싸서 사용해야 Sidebar, SidebarTrigger 등이 정상 동작합니다.
+// 예시:
+// <SidebarProvider>
+//   <Sidebar>
+//     ...메뉴...
+//   </Sidebar>
+// </SidebarProvider>
 
 export {
   Sidebar,
