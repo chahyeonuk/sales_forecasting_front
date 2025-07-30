@@ -56,24 +56,38 @@ function SidebarProvider({
   const isMobile = useIsMobile();
   const [openMobile, setOpenMobile] = React.useState(false);
 
+  // Determine initial sidebar state from cookie if available
+  const getInitialOpen = React.useCallback(() => {
+    if (typeof document === "undefined") return defaultOpen;
+    const match = document.cookie.match(
+      new RegExp(`(?:^|; )${SIDEBAR_COOKIE_NAME}=([^;]*)`),
+    );
+    return match ? match[1] === "true" : defaultOpen;
+  }, [defaultOpen]);
+
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
-  const [_open, _setOpen] = React.useState(defaultOpen);
+  const [_open, _setOpen] = React.useState(getInitialOpen);
   const open = openProp ?? _open;
   const setOpen = React.useCallback(
     (value) => {
-      const openState = typeof value === "function" ? value(open) : value;
-      
-      if (setOpenProp) {
-        setOpenProp(openState);
-      } else {
-        _setOpen(openState);
-      }
+      const updater = typeof value === "function" ? value : () => value;
 
-      // This sets the cookie to keep the sidebar state.
-      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+      if (setOpenProp) {
+        setOpenProp((prev) => {
+          const next = updater(prev);
+          document.cookie = `${SIDEBAR_COOKIE_NAME}=${next}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+          return next;
+        });
+      } else {
+        _setOpen((prev) => {
+          const next = updater(prev);
+          document.cookie = `${SIDEBAR_COOKIE_NAME}=${next}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
+          return next;
+        });
+      }
     },
-    [setOpenProp, open],
+    [setOpenProp],
   );
 
   // Helper to toggle the sidebar.
