@@ -40,7 +40,6 @@ function useSidebar() {
   if (!context) {
     throw new Error("useSidebar must be used within a SidebarProvider.");
   }
-
   return context;
 }
 
@@ -56,7 +55,6 @@ function SidebarProvider({
   const isMobile = useIsMobile();
   const [openMobile, setOpenMobile] = React.useState(false);
 
-  // Determine initial sidebar state from cookie if available
   const getInitialOpen = React.useCallback(() => {
     if (typeof document === "undefined") return defaultOpen;
     const match = document.cookie.match(
@@ -71,24 +69,20 @@ function SidebarProvider({
   const open = openProp ?? _open;
   const setOpen = React.useCallback(
     (value) => {
-      const updater = typeof value === "function" ? value : () => value;
-
+      const openState = typeof value === "function" ? value(open) : value;
+      
       if (setOpenProp) {
-        setOpenProp((prev) => {
-          const next = updater(prev);
-          document.cookie = `${SIDEBAR_COOKIE_NAME}=${next}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
-          return next;
-        });
+        setOpenProp(openState);
       } else {
-        _setOpen((prev) => {
-          const next = updater(prev);
-          document.cookie = `${SIDEBAR_COOKIE_NAME}=${next}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
-          return next;
-        });
+        _setOpen(openState);
       }
+
+      // This sets the cookie to keep the sidebar state.
+      document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`;
     },
-    [setOpenProp],
+    [setOpenProp, open],
   );
+  
 
   // Helper to toggle the sidebar.
   const toggleSidebar = React.useCallback(() => {
@@ -161,7 +155,7 @@ function Sidebar({
   children,
   ...props
 }) {
-  const { isMobile, state, openMobile, setOpenMobile } = useSidebar();
+  const { isMobile, state, open, setOpen, openMobile, setOpenMobile } = useSidebar();
 
   if (collapsible === "none") {
     return (
@@ -203,16 +197,20 @@ function Sidebar({
     );
   }
 
+  // 데스크탑(768px 이상)에서는 사이드바를 보이거나 숨기는 방식으로 동작하도록 수정
+  
   return (
     <div
-      className="group peer text-sidebar-foreground hidden md:block"
+      className={cn(
+        "group peer text-sidebar-foreground md:block",
+        open ? "md:block" : "md:hidden",
+      )}
       data-state={state}
       data-collapsible={state === "collapsed" ? collapsible : ""}
       data-variant={variant}
       data-side={side}
       data-slot="sidebar"
     >
-      {/* This is what handles the sidebar gap on desktop */}
       <div
         data-slot="sidebar-gap"
         className={cn(
@@ -227,7 +225,8 @@ function Sidebar({
       <div
         data-slot="sidebar-container"
         className={cn(
-          "fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex",
+          // hidden을 md:flex로 변경하여 데스크탑에서 항상 컨텐츠가 보이도록 수정
+          "fixed inset-y-0 z-10 h-svh w-(--sidebar-width) transition-[left,right,width] duration-200 ease-linear md:flex",
           side === "left"
             ? "left-0 group-data-[collapsible=offcanvas]:left-[calc(var(--sidebar-width)*-1)]"
             : "right-0 group-data-[collapsible=offcanvas]:right-[calc(var(--sidebar-width)*-1)]",
